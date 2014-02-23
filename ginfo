@@ -1,0 +1,8 @@
+#! /bin/bash
+clear
+echo "Hello $USER"
+echo "Today is \c ";date
+echo "The number of users currently logged in : \c"who | wc -l
+echo "Calendar"
+cal
+exit 0
