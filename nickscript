@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#Script to
+#1. Create a local group in the System zone.
+#2. Assign an ACL to the directory giving the local system group generic_all,object_inherit,container_inherit.
+#3. Assign AD and NIS user membership to the group.
+
+echo "This script will help you automate creating local groups, assigning Full Control and Inheritance permissions to the local group to a directory of your
+choosing, and assign users to the local group."
+
+echo -n "Enter the desired local group name and press [ENTER]: "
+read groupname
+isi auth groups create --name=$groupname --zone=System -v
+echo -n "Enter the directory in which the group permissions for $groupname will be applied and press [ENTER]: "
+read path
+chmod -v +a group $groupname allow generic_all,object_inherit,container_inherit $path
+echo -n "$path now has the following permissions: "
+echo ""
+ls -led $path
+echo ""
+echo -n "Input a comma separated list of users you'd like to assign as members of group $groupname: "
+export IFS=","
+read sentence
+for word in $sentence; do isi auth users modify --user=$word --zone=System --add-group=$groupname
+    echo "$word"
+    done
+
