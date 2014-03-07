@@ -1,0 +1,47 @@
+#!/bin/bash
+#
+#-A script to grab errors from message files
+#
+searchby=$1
+
+loc="$(pwd)"
+
+echo $loc
+
+#list="$loc/*"
+
+#OIFS=$IFS
+
+#IFS='\n'
+FILECOUNT="$(ls $loc | grep -v ^l | wc -l)"
+
+
+FILELIST=("$(ls $loc)")
+
+
+echo "There are $FILECOUNT files in $loc"
+
+echo "The search param is $searchby"
+
+for x in $FILELIST
+do
+   #echo "Processing $x"
+   echo "----------------------------------------------------"
+   echo "$x"
+   echo "----------------------------------------------------"
+   result="$(grep -i $searchby $x)"
+   echo "$result"
+   echo ""
+done 
+
+
+
+exit 0
+
+for y in ${filenames[@]}
+do
+  echo "Processing ${filenames[$y]}"
+
+done
+
+#IFS=$OIFS
