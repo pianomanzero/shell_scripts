@@ -1,5 +1,4 @@
 #!/bin/bash
-#
 #-A script to grab errors from message files
 #
 searchby=$1
@@ -16,7 +15,7 @@ echo $loc
 FILECOUNT="$(ls $loc | grep -v ^l | wc -l)"
 
 
-FILELIST=("$(ls $loc)")
+FILELIST=("$(ls $loc | sort -V)")
 
 
 echo "There are $FILECOUNT files in $loc"
@@ -27,9 +26,9 @@ for x in $FILELIST
 do
    #echo "Processing $x"
    echo "----------------------------------------------------"
-   echo "$x"
+   echo "$x  Search parameter: $searchby"
    echo "----------------------------------------------------"
-   result="$(grep -i $searchby $x)"
+   result="$(grep -i $searchby $x | grep -i 2014 | sort | uniq -f2)"
    echo "$result"
    echo ""
 done 
