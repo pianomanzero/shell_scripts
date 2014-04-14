@@ -3,7 +3,10 @@
 #-errorgrab v2.0
 #-A script to grab errors from message files
 #
-
+#- in development:
+#- find logspam, multiple
+#
+#
 echo "**************************************"
 echo "**        errorgrab v. 2.0          **"
 echo "**************************************"
