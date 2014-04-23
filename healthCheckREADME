@@ -1,0 +1,77 @@
+This script is specifically for use on Elvis against logs collected with the “rr_ healthcheck.sh” v1.00
+
+ Written by: Darren Schaat
+ Created: March 27th 2014
+ Disclaimer: This script is provided without any official support from EMC or it's affiliates.
+
+Version 1.0
+ Initial Release
+
+Version 1.0.1
+ 1. Added line that grabs the cluster GUID at the beginning of the script
+ 2. Improved headers
+ 3. Changed some of the headers wording to match wording found in the "docu51782_Isilon-Cluster-Health-Check-Tests.xlsx' file
+ 4. Improved formatting
+
+Version 1.0.2
+ 1. Added Color
+
+Version 1.0.3
+ 1. Added separate file for "Cluster Information" not relevant to the Pass/Fail tests of the report doc.
+ 2. Added "Cluster Name" information into file 'parsed_health_check_logs.txt'.
+ 3. Patch information now only outputs the 'patch-<number>'
+
+Version 1.0.4
+ 1. Removed second file and combined all output back to one file 'parsed_health_check_logs.txt'
+ 2. Changed order of output to match Report doc.
+ 3. Changed output displayed for "Diagnostic Check" to display all output.
+ 4. Added headers to make it easier to differentiate what output belongs to what sections of the Report doc.
+
+Version 1.1.0
+ Changed version progression
+ Minor Bug Fixes:
+ 1. Fixed "Cluster Name" where a cluster name containing multiple hyphens in the name would not output correctly.
+ 2. Fixed "Check Disk Space" where it would not output percentages >80% as intended.
+
+ Personal Note:
+ The idea behind this script is so you will have everything you need for the health check Report document orginized in one file.
+ This will allow information to be found more quickly as we will only need to look in one file rather than several.
+ Some of the output can be rather large like the "Interface Configurations" and cannot be avoided.
+ Other outputs have been filtered similar to 'tpark' where instead of showing all the healthy drives
+ we are only looking for non-healthy drives.
+
+
+ 
+Instructions:
+
+1.  Place script in ~/bin directory on Elvis using WinSCP or other method.
+	a. If /bin does not exist simply create directory 'bin' in your home directory
+	
+2.  Change permissions to 755 on the directory and script file
+3.  Navigate to health check log directory.
+	EXAMPLE: cd /logs/CAPITAL_ONE/2014-03-27-001/VDCISILON01-1/ifs-data-Isilon_Support-61997676_HealthCheck.tar/61997676_HealthCheck
+
+4.  Run script
+	health_check_logs_script.sh
+
+5. less -r parsed_health_check_logs.txt
+
+
+Known Issues:
+
+Piping output into the 'less' command does not display colors only additional characters.
+	a. Use 'more' instead.
+	b. Use suggested "less -r", although using this I noticed sometimes color would look different when back scrolling. Less likes to do weird things.
+	
+Haven't tested with other text editors and am not sure what does and doesn't show the color formatting.
+
+
+A Personal Note:
+
+I created this script with how I write a final report in mind. I do not add output in the report for tests that 'PASS' other than to put how they passed. For example, if disk space is less than %80, then in the final report I put "Space used <80%". There is no need, in my opinion, to show the customer if it passed other than it passed the test. With that in mind this is why I have intentionally left out some of the output. I felt it more important a customer have output of what failed in the final report and not what succeeded.
+
+Adding the output of everything in the report is:
+	a. cumbersome
+	b. confusing to the customer
+	c. doesn't fit in those stupid little cells properly as is
+	d. Makes it difficult to find relevant output of what failed in the report
