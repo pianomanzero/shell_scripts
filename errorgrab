@@ -39,7 +39,7 @@ fi
 function message_search(){
   echo "Looking for messages logs..."
 
-  $(cd ./messages)
+  "$(cd $loc/messages)"
 
 
   echo "What are you searching for? (case insensitive)"
