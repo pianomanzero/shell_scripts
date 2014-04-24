@@ -1,60 +1,138 @@
 #!/bin/bash
 #
-#-errorgrab v2.0
+#-errorgrab v2.0.1
 #-A script to grab errors from message files
 #
 #- in development:
 #- find logspam, multiple
 #
 #
-echo "**************************************"
-echo "**        errorgrab v. 2.0          **"
-echo "**************************************"
 
-echo "What are you searching for? (case insensitive)"
-read searchby
+#startup function
+function startup (){
+echo "**************************************"
+echo "**        errorgrab v. 2.0.1        **"
+echo "**************************************"
+echo ""
+echo "Checking current directory..."
 
-echo "How far back would you like to search? (date format YYYY-MM-DD, format can be a fragmnet like YYYY-MM or YYYY)"
-read timeframe
+username="$(whoami)"
+
+echo "Hello $username"
 
 loc="$(pwd)"
 
-echo $loc
+echo "Our current location is $loc . Is this the root of the logset? (y/n)"
+read atroot
 
-#list="$loc/*"
-
-#OIFS=$IFS
-
-#IFS='\n'
-FILECOUNT="$(ls $loc | grep -v ^l | wc -l)"
-
-
-FILELIST=("$(ls $loc | sort -V)")
-
-
-echo "There are $FILECOUNT files in $loc"
-
-echo "The search param is $searchby"
-
-for x in $FILELIST
-do
-   #echo "Processing $x"
-   echo "----------------------------------------------------"
-   echo "$x  Search parameter: $searchby"
-   echo "----------------------------------------------------"
-   result="$(grep -i $searchby $x | grep -i $timeframe | sort | uniq -f2)"
-   echo "$result"
-   echo ""
-done 
+if [ "$atroot" = "y" ]
+then
+  MAINF
+else
+  echo "Please re-run this script from the root of the logset"
+  exit 0
+fi
+} #end startup
 
 
+#message search
+function message_search(){
+  echo "Looking for messages logs..."
 
-exit 0
+  $(cd ./messages)
 
-for y in ${filenames[@]}
-do
-  echo "Processing ${filenames[$y]}"
 
-done
+  echo "What are you searching for? (case insensitive)"
+  read searchby
 
-#IFS=$OIFS
+  echo "How far back would you like to search? (date format YYYY-MM-DD, format can be a fragmnet like YYYY-MM or YYYY)"
+  read timeframe
+
+  echo "Would you like to output the results to a file? (y/n)"
+  read writefile
+
+  if [ $writefile = "y" ]
+  then
+    myfilename="messages_$(date +%m%d%Y)_$searchby"
+    echo $myfilename
+  fi
+
+  #list="$loc/*"
+
+  #OIFS=$IFS
+
+  #IFS='\n'
+  FILECOUNT="$(ls $loc | grep -v ^l | wc -l)"
+
+
+  FILELIST=("$(ls $loc | sort -V)")
+
+
+  echo "There are $FILECOUNT files in $loc" 
+
+  echo "The search param is $searchby"
+
+  if [ $writefile = "y" ]
+  then
+
+    for x in $FILELIST
+      do
+      echo "----------------------------------------------------" >> $myfilename
+      echo "$x  Search parameter: $searchby" >> $myfilename
+      echo "----------------------------------------------------" >> $myfilename
+      result="$(grep -i $searchby $x | grep -i $timeframe | sort | uniq -f3)"
+      echo "$result" >> $myfilename
+      echo "" >> $myfilename
+    done
+    echo "Output has been written to $myfilename"
+  else
+
+    for x in $FILELIST
+      do
+      echo "----------------------------------------------------"
+      echo "$x  Search parameter: $searchby"
+      echo "----------------------------------------------------"
+      result="$(grep -i $searchby $x | grep -i $timeframe | sort | uniq -f2)"
+      echo "$result"
+      echo ""
+    done 
+  fi
+
+
+
+  $(cd $loc)
+  #exit 0
+  MAINF
+} #end message file search
+
+#main function
+function MAINF(){
+echo "What would you like to do?"
+echo "1 - Perform search of messages files"
+echo "2 - this is option two"
+echo "3 - this is option three"
+read option
+
+case "$option" in
+  1)
+    message_search
+    ;;
+  2)
+    echo ""
+    echo "that functionality isn't quite ready yet"
+    echo ""
+    MAINF
+    ;;
+  *)
+    echo ""
+    echo "please pick a valid option"
+    echo ""
+    MAINF
+    ;;
+esac
+
+
+}
+#end main
+
+startup
