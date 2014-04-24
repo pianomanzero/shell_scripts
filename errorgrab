@@ -21,8 +21,9 @@ username="$(whoami)"
 echo "Hello $username"
 
 loc="$(pwd)"
+rootdir="$loc"
 
-echo "Our current location is $loc . Is this the root of the logset? (y/n)"
+echo "Our current location is $rootdir . Is this the root of the logset? (y/n)"
 read atroot
 
 if [ "$atroot" = "y" ]
@@ -39,8 +40,8 @@ fi
 function message_search(){
   echo "Looking for messages logs..."
 
-  "$(cd $loc/messages)"
-
+  messageDir="$loc/messages"
+  changedir $messageDir
 
   echo "What are you searching for? (case insensitive)"
   read searchby
@@ -67,8 +68,9 @@ function message_search(){
 
   FILELIST=("$(ls $loc | sort -V)")
 
-
-  echo "There are $FILECOUNT files in $loc" 
+  echo "Looking for files in $(pwd)"
+  echo  ""
+  echo "There are $FILECOUNT files in $(pwd)" 
 
   echo "The search param is $searchby"
 
@@ -100,10 +102,16 @@ function message_search(){
 
 
 
-  $(cd $loc)
+  changedir $rootdir
   #exit 0
   MAINF
 } #end message file search
+
+function changedir() {
+
+  cd $1
+  loc="$(pwd)"
+}
 
 #main function
 function MAINF(){
@@ -111,6 +119,7 @@ echo "What would you like to do?"
 echo "1 - Perform search of messages files"
 echo "2 - this is option two"
 echo "3 - this is option three"
+echo "q - Quit to shell"
 read option
 
 case "$option" in
@@ -122,6 +131,12 @@ case "$option" in
     echo "that functionality isn't quite ready yet"
     echo ""
     MAINF
+    ;;
+  q)
+    exit 0
+    ;;
+  Q)
+    exit 0
     ;;
   *)
     echo ""
