@@ -317,22 +317,6 @@ function healthy(){
   done
 
 
-  echo "" >> $myfile
-  echo ":::::::::::::::::::::::::::::::::::" >> $myfile
-  echo ":       Installed Packages        :" >> $myfile
-  echo ":::::::::::::::::::::::::::::::::::" >> $myfile
-  echo "" >> $myfile
-   
-  for dir in ${nodeArray[@]}
-  do
-    echo $dir >> $myfile
-    cat $dir/varlog.tar/log/isi_pkg >> $myfile
-    echo ""
-  done
-
-
-
-
   #go back to main
   MAINF
 }
