@@ -191,6 +191,8 @@ function rollup(){
 #end rollup patch check
 
 #general health check
+# :: TODO :: add option to prepend SR number to file
+
 function healthy(){
   echo "Running simple health check....."
   echo ""
@@ -311,8 +313,10 @@ function healthy(){
    
   for dir in ${nodeArray[@]}
   do
+    echo ""
     echo $dir >> $myfile
-    cat $dir/varlog.tar/log/isi_pkg >> $myfile
+    echo ""
+    cat $dir/varlog.tar/log/isi_pkg | grep -i installed >> $myfile
     echo ""
   done
 
