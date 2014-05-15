@@ -6,7 +6,7 @@
 # customiezd for the ap-filr-cp4 cluster 
 # and not for use as written on any other cluster
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-isi_for_array -n6-12 -s isi_cache_stats -z
+isi_for_array -n6-12 -s "isi_cache_stats -z"
 for (( i = 1 ; i < 61 ; i++ ))
 do
   echo "Iteration $i"
@@ -28,3 +28,8 @@ done
 
 # Uncomment the following lines if these stats need to persist through reboots and upgrades.
 # If this script is being used for upgrade prep, do not set the overrides
+#isi_for_array -n1-2 -s "echo 'efs.lin.lock.initiator.lazy_queue_goal=1000008' >> /etc/local/sysctl.conf"
+#isi_for_array -n1-2 -s "echo 'efs.ref.initiator.lazy_queue_goal=1000008' >> /etc/local/sysctl.conf"
+#isi_for_array -n1-2 -s "echo 'efs.mds.block_lock.initiator.lazy_queue_goal=250000' >> /etc/local/sysctl.conf"
+#isi_for_array -n1-2 -s "echo 'efs.bam.datalock.initiator.lazy_queue_goal=300000' >> /etc/local/sysctl.conf"
+#
