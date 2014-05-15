@@ -7,9 +7,10 @@
 # and not for use as written on any other cluster
 # :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+
 isi_for_array -n6-12 -s isi_cache_stats -z
 
-for (( i = 1; i < 61; i++ ))
+for (( i = 1 ; i < 61 ; i++ ))
 do
   echo "Iteration $i"
   let "lin = 60006000 - 83333 * $i"
