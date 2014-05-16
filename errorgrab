@@ -1,24 +1,32 @@
 #!/bin/bash
 #
-#-errorgrab v2.0.1
-#-A script to grab errors from message files
+#-errorgrab
+#-A script to grab stuff from logsets
+#
+#- 1- place this file in your ~/bin directory on elvis.igs.corp
+#-    -if  you do not have a bin directory, create one. 
+#-    -this directory is already in your user's path on elvis
+#- 3- make the script executable (chmod +x errorgrab)
+#- 4- enter errograb in the root of the logset to be analyzed
+#
 #
 #- in development:
-#- find logspam, multiple
+#- SMB rollup patch status, hardware scan, 
 #
 #
 
 #startup function
 function startup (){
-echo "**************************************"
-echo "**        errorgrab v. 2.0.1.1      **"
-echo "**************************************"
+
+echo -e "$(tput bold)**************************************"
+echo -e "**        errorgrab v. 2.0.1.2      **"
+echo -e "**************************************$(tput sgr0)"
 echo ""
 echo "Checking current directory..."
 
 username="$(whoami)"
 
-echo "Hello $username"
+echo -e "$(tput bold)Hello $username$(tput sgr0)"
 
 loc="$(pwd)"
 rootdir="$loc"
@@ -170,9 +178,21 @@ function changedir() {
 
 #hw scan
 function hwscan(){
+  myfilename="general_hardware_scan_$(date +%m%d%Y)"
+  echo "Output will be written to $myfilename"
   echo ""
   echo ""
-  echo "That functionality isn't quite ready yet. Check for updates soon"
+  echo "----------------------------------------------------" >> $myfilename
+  echo "General Hardware Status" >> $myfilename
+  echo "----------------------------------------------------" >> $myfilename
+ 
+  for dir in ${nodeArray[@]}
+  do
+    echo $dir >> $myfilename
+    cat $dir/isi_hw_status >> $myfilename
+    echo ""
+  done
+  echo ""
   echo ""
   MAINF
 }
@@ -326,6 +346,68 @@ function healthy(){
 }
 #end health check
 
+#high iops by node
+function highops(){
+  
+  for dir in ${nodeArray[@]}
+  do
+    echo ""
+    echo $dir
+    echo ""
+    grep SATA $dir/isi_statistics_drive | cut -d \: -f2- | awk '{print "The Highest IOPs out is on Drive: "$1" Which has: "$5" IOPs, "$4"B of throughput in, "$6"B of throughput out, and "$3" IOPs in."}' | sort -k11n | tail -1
+    echo ""
+    echo ""
+  done
+  
+  MAINF
+}
+#end highops
+
+
+#help screen
+function helpscreen(){
+
+
+  clear
+  echo ""
+  echo -e "$(tput bold)**********************************************************************$(tput sgr0)"
+  echo -e "$(tput bold)Help Screen$(tput sgr0)"
+  echo -e "$(tput bold)**********************************************************************$(tput sgr0)"
+  echo ""
+  echo -e "$(tput bold)Search message files$(tput sgr0)"
+  echo "Performs a search of each node's message log.  In this version search is limited to one word."
+  echo "Search results can be output to screen or to file, which will be placed in the <log_set>/messages directory."
+  echo ""      
+  echo -e "$(tput bold)Message file tails$(tput sgr0)"
+  echo "Grabs a specified number of lines from the end of each node's messages log"
+  echo "Search results can be output to screen or to file, which will be placed in the <log_set>/messages directory."
+  echo ""
+  echo -e "$(tput bold)List nodes$(tput sgr0)"
+  echo "List out nodes in this cluster"
+  echo "Future revisions will contain additional simple information on each node."
+  echo ""              
+  echo -e "$(tput bold)Hardware scan$(tput sgr0)"
+  echo "Outputs each node's isi_hw_status file and compiles them into one file in the logset root"
+  echo ""                
+  echo -e "$(tput bold)SMB rollup patch status$(tput sgr0)"
+  echo "Incomplete. Will report whether the cluster has the most current SMB rollup patch installed."
+  echo ""                  
+  echo -e "$(tput bold)General cluster health$(tput sgr0)"
+  echo "Preforms a quick and dirty health check. Includes information from  isi status, boot drives,"
+  echo "root partition space, simple hardware status, firmware status, group statements, uptime, installed packages."
+  echo ""                      
+  echo -e "$(tput bold)High IOPs by node$(tput sgr0)"
+  echo "Lists out the SATA disk with the highest IOPs per node ordered by highest."
+  echo ""                        
+  echo -e "$(tput bold)Help screen$(tput sgr0)"
+  echo "Helps you understand stuff better"
+  echo ""
+  echo -e "$(tput bold)Quit to shell$(tput sgr0)"
+  echo "Buh bye!"
+  echo ""
+}
+#end helpscreen
+
 #list nodes
 function listnodes(){
   echo "OneFS $VERSION"
@@ -348,13 +430,15 @@ function loadnodes(){
 #main function
 function MAINF(){
 echo ""
-echo "What would you like to do?"
+echo -e "$(tput bold)What would you like to do?$(tput sgr0)"
 echo "1 - Search messages files"
 echo "2 - Message file tails"
 echo "3 - List nodes"
-echo "4 - hardware scan"
+echo "4 - Hardware scan"
 echo "5 - SMB rollup patch status"
 echo "6 - General cluster health"
+echo "7 - High IOPs by node"
+echo "h - Help screen"
 echo "q - Quit to shell"
 echo ""
 read option
@@ -384,11 +468,27 @@ case "$option" in
     echo ""
     healthy
     ;;
+  7)
+    echo ""
+    highops
+    ;;
+  h)
+    echo ""
+    helpscreen
+    ;;
+  H)
+    echo ""
+    helpscreen
+    ;;
   q)
+    echo -e "$(tput bold)Bye $username!$(tput sgr0)"
+    sleep 1 
     clear
     exit 0
     ;;
   Q)
+    echo -e "$(tput bold)Bye $username!$(tput sgr0)"
+    sleep 1
     clear
     exit 0
     ;;

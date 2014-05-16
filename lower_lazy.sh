@@ -1,14 +1,12 @@
 #!/bin/bash
-# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 # lower_lazy.sh
 #
 # custom script to gracefully lower the lazy_queue_goal sysctl stats
 # customiezd for the ap-filr-cp4 cluster 
 # and not for use as written on any other cluster
-# :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-isi_for_array -n6-12 -s "isi_cache_stats -z"
+isi_for_array -n6-12 -s isi_cache_stats -z
 for (( i = 1 ; i < 61 ; i++ ))
-do
+do	
   echo "Iteration $i"
   let "lin = 60006000 - 83333 * $i"
   let "mds = 1500000 - 20733 * $i"
