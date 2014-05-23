@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#using select statements
+#select statements are like for loops except they take a list or array and generate
+#a selectable menu based on the list. The statement will then iterate after each option
+#is selected and perform the indicated action upon the selected option.
+
+declare -a OPTIONS
+OPTIONS=(1 2 3 4)
+
+select o in "${OPTIONS[@]}"
+do
+  echo "You selected $o, good job!"
+done
+
+
