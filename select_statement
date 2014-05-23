@@ -6,11 +6,11 @@
 #is selected and perform the indicated action upon the selected option.
 
 declare -a OPTIONS
-OPTIONS=(1 2 3 4)
-
+OPTIONS=(one two three four)
+PS3="Select an option: "
 select o in "${OPTIONS[@]}"
 do
-  echo "You selected $o, good job!"
+  echo "You selected $o"
 done
 
 
