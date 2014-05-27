@@ -1,0 +1,35 @@
+#!/bin/bash
+# backup - a script to back up a directory
+
+# directory to store archives, edit according to preference
+STORAGE_DIR="backup"
+
+# date in month/day format
+DATE=$(date +%b%d)
+
+function dobackup () {
+
+  if [ -d /$STORAGE_DIR ] && [ -s /$STORAGE_DIR ]
+  then
+    tar cfz /$STORAGE_DIR/$DATE-$HOSTNAME-$BACKUP_DIR.tgz /$1/*
+  else
+    echo "Storage directory may not be mounted, please check and try again"
+    exit 1
+  fi
+  
+} #end dobackup
+
+for BACKUP_DIR in "$@"
+do
+
+  dobackup $BACKUP_DIR
+  if [ $? -eq 0 ]
+  then
+    echo "$DATE : Wrote backup archive for $BACKUP_DIR" >> /var/log/backups.log
+  else
+    echo "$DATE : Unsuccessful backup for $BACKUP_DIR" >> /var/log/backups.log
+  fi
+
+done
+
+
