@@ -1,0 +1,208 @@
+#!/bin/bash
+# check_health
+# a script to run a simple health check 
+# based on a collected log set
+# this script is meant to be placed in your ~/bin file
+# in your home directory on elvis
+# to use, chmod +x ~/bin check_health
+# then enter check_health in the root directory of 
+# the logset to be scanned
+
+
+function startup(){
+
+  loc="$(pwd)"
+  rootdir="$loc"
+  
+
+}
+
+
+function loadnodes(){
+  nodes="$(cut -d' ' -f3 nodes_info | grep -v node)"
+  nodeArray=($nodes)
+  VERSION="$(cut -d' ' -f4 ${nodeArray[0]}/uname)"
+} #end loadnodes
+
+function listnodes(){
+  echo "****************************"
+  echo "*      OneFS $VERSION      *"
+  echo "****************************"
+  echo ""
+
+  echo "****************************"
+  echo "*          Nodes           *"
+  echo "****************************"
+  for i in ${nodeArray[@]}
+  do
+    echo $i
+  done
+
+} #end listnodes
+
+function testroot(){
+ echo "checking for ${nodeArray[0]}..." 
+ 
+  if [ -d "${nodeArray[0]}" ]
+  then
+      echo ""
+  else
+    echo "please re-run this script from the root of the fileset"
+    exit 0
+  fi
+
+
+} #end testroot
+
+function checkh(){
+  echo ""
+  echo ""
+
+  echo "****************************"
+  echo "*       isi status         *"
+  echo "****************************"
+  cat ${nodeArray[0]}/isi_status
+  echo ""
+  echo ""
+
+  echo "****************************"
+  echo "*       boot drives        *"
+  echo "****************************"
+  echo ""
+  
+  for dir in ${nodeArray[@]}
+  do
+    echo $dir
+    grep -i 'ad4\|ad7' $dir/atacontrol
+    echo ""
+  done
+  echo ""
+  
+  for dir in ${nodeArray[@]}
+  do
+    echo $dir
+    grep -i complete $dir/gmirror_status | wc -l
+    echo ""
+  done
+
+  echo ""
+  echo "Check for degraded boot drives"
+  for dir in ${nodeArray[@]}
+  do
+    echo $dir
+    grep -i degraded $dir/gmirror_status
+    echo ""
+  done
+
+  echo ""
+  echo "******************************"
+  echo "* Check root partition space *"
+  echo "******************************"
+  echo ""
+  for dir in ${nodeArray[@]}
+  do
+    echo $dir
+    grep -i root $dir/df
+    echo ""
+  done
+
+  echo ""
+
+  echo "******************************"
+  echo "*   Check hardware status    *"
+  echo "******************************"
+  for dir in ${nodeArray[@]}
+  do
+    echo $dir
+    cat $dir/isi_hw_status | grep -A 5 -i 'Battery1:'
+    echo ""
+    cat $dir/isi_hw_status | grep -A 2 -i 'PwrSup1'
+    echo ""
+  done
+
+  echo ""
+  echo "******************************"
+  echo "*   Check firmware status    *"
+  echo "******************************"
+    cat $loc/firmware
+
+  echo ""
+
+  echo "*******************************"
+  echo "* Group Statement Consistency *"
+  echo "*******************************"
+  for dir in ${nodeArray[@]}
+  do
+    echo $dir
+    cat $dir/efs.gmp.group
+    echo ""
+  done
+
+  echo ""
+  
+  echo "******************************"
+  echo "*          Uptime            *"
+  echo "******************************"
+  for dir in ${nodeArray[@]}
+  do
+    echo $dir
+    cat $dir/uptime
+    echo ""
+  done
+
+
+  echo ""
+
+  echo "******************************"
+  echo "*    Installed Packages      *"
+  echo "******************************"
+  for dir in ${nodeArray[@]}
+  do
+    echo ""
+    echo $dir
+    echo ""
+    cat $dir/varlog.tar/log/isi_pkg | grep -i installed
+    echo ""
+  done
+
+
+
+
+}
+
+
+function healthy(){
+
+  echo "Running simple health check"
+  echo ""
+    myfile="simple_health_check_$(date +%m%d%Y)"
+  if [ -f "simple_health_check_$(date +%m%d%Y)" ]
+  then
+    echo "$myfile already exists. $myfile will be overwritten."
+    $(rm $myfile) 
+  fi
+  echo "Output will be written to $myfile"
+  echo ""
+  echo "Checking basic cluster health..."
+  echo ""
+  listnodes >> $myfile
+  
+  checkh >> $myfile
+}
+
+function MAINF(){
+
+  startup
+
+  loadnodes
+
+  testroot
+
+  #listnodes
+
+  healthy
+
+
+} #end main function
+
+MAINF
