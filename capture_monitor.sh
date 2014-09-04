@@ -6,7 +6,7 @@ function ctrl_c(){
 	echo "Ending capture..."
   killcap
 	echo "Ending monitor..."
-	echo "Ending monitor - $(date)" >> capture_log.out
+  echo "$(date '+%Y-%m-%d-T%H%M%S') - Ending monitor" >> capture_log.out
 	echo "Compressing files... Please wait..."
   package
 
@@ -21,7 +21,7 @@ function setup(){
 
   #startup functions go here
   mkdir positive_hits
-  echo "Starting new log, $(date)" > capture_log.out
+  echo "$(date '+%Y-%m-%d-T%H%M%S') - Starting new log" > capture_log.out
 
 } #end startup
 
@@ -49,16 +49,15 @@ function package(){
 
   #packaging functions go here
   mv capture_log.out ./positive_hits/capture_log_$L-$(date '+%Y-%m-%d-T%H%M%S').out
-  $ARCHIVE_FILE = "64428756_mon_caps-$(date '+%Y-%m-%d-T%H%M%S').tar.gz"
+  ARCHIVE_FILE="64428756_mon_caps-$(date '+%Y-%m-%d-T%H%M%S').tar.gz"
 	tar -czf $ARCHIVE_FILE ./positive_hits
-  screen -dm isi_gather_info --nologs -f /ifs/data/Isilon_Support/64428756_monitored_captures/$ARCHIVE_FILE
 
 } #end package
 
 
 function startcap(){
   #capture functionality 
-  echo "Starting capture: $(date '+%Y-%m-%d-T%H%M%S')" >> capture_log.out
+  echo "$(date '+%Y-%m-%d-T%H%M%S') - Starting capture" >> capture_log.out
   isi_for_array -s 'screen -dm tcpdump -i cxgb1 -C 25 -W 40 -w /ifs/data/Isilon_Support/64428756_monitored_captures/$(hostname).$(date '+%Y-%m-%d-T%H-%M-%S').cxgb1_01.pcap' 
 
 } #end startcap
@@ -70,7 +69,7 @@ function monitor(){
 
   sleep 60
   echo "Starting Monitor..."
-  echo "Starting Monitor: $(date '+%Y-%m-%d-T%H%M%S')" >> capture_log.out 
+  echo "$(date '+%Y-%m-%d-T%H%M%S') - Starting Monitor" >> capture_log.out 
   while true; do
 	  for q in $(ls | grep pcap)
 	  do
@@ -80,9 +79,13 @@ function monitor(){
 	    then
         killcap
 	      echo "$(date) - NOSPC found in $q in iteration $L" >> capture_log.out
-			  echo "" >> capture_log.out 
 			  mv $q ./positive_hits/positive-hit_$L-$q
-			  isi_for_array -s sysctl efs.dexitcode_ring_verbose >> ./positive_hits/$(hostname)-$L-dexitcode.out
+        echo "$(date '+%Y-%m-%d-T%H%M%S') - Collecting dexitcode info for iteration $L" >> capture_log.out 
+        isi_for_array -s sysctl efs.dexitcode_ring_verbose >> ./positive_hits/iteration-$L-$(date '+%Y%m%dT%H%M%S')-dexitcode.out
+        echo "$(date '+%Y-%m-%d-T%H%M%S') - Collecting process log for iteration $L" >> capture_log.out 
+        isi_for_array -s ps -auwwx >> ./positive_hits/process_log-$L-$(date '+%Y%m%dT%H%M%S').out
+        echo "$(date '+%Y-%m-%d-T%H%M%S') - Collecting kern.proc.all_stacks log for iteration $L" >> capture_log.out 
+        isi_for_array -s sysctl kern.proc.all_stacks >> ./positive_hits/kern.proc.all_stacks-$L-$(date '+%Y%m%dT%H%M%S').out
         package
         cleanup
         setup
@@ -98,7 +101,7 @@ function killcap(){
 
   #killing functionality goes here
 	echo ""
-  echo "Ending capture:  $(date '+%Y-%m-%d-T%H%M%S')" >> capture_log.out
+  echo "$(date '+%Y-%m-%d-T%H%M%S') Ending capture" >> capture_log.out
 	isi_for_array killall -INT tcpdump
   sleep 1
 
@@ -108,16 +111,19 @@ function killcap(){
 function firstrun(){
   #function to check to see if we're in the proper dir, if not change to it
   #and clear out any existing garbage in our proper diretory before running
-  $OURDIR = "/ifs/data/Isilon_Support/64428756_monitored_captures"
-  $PWD = "$(pwd)"
-  if [[ ! -d "$OURDIR"]]
+  
+  if [[ ! -d "/ifs/data/Isilon_Support/64428756_monitored_captures" ]]
   then
-    mkdir $OURDIR
+    mkdir /ifs/data/Isilon_Support/64428756_monitored_captures
+  else
+    echo "/ifs/data/Isilon_Support/64428756_monitored_captures already exists"
   fi
 
-  if [[ $PWD != $OURDIR ]]
+  if [[ $(pwd) != "/ifs/data/Isilon_Support/64428756_monitored_captures" ]]
   then
-    cd $OURDIR
+    cd "/ifs/data/Isilon_Support/64428756_monitored_captures"
+  else
+    echo "Alread in /ifs/data/Isilon_Support/64428756_monitored_captures"
   fi
 
   for g in $(ls | grep -i ".pcap")
