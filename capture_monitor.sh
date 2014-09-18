@@ -58,7 +58,7 @@ function package(){
 function startcap(){
   #capture functionality 
   echo "$(date '+%Y-%m-%d-T%H%M%S') - Starting capture" >> capture_log.out
-  isi_for_array -s 'screen -dm tcpdump -i cxgb1 -C 25 -W 40 -w /ifs/data/Isilon_Support/64428756_monitored_captures/$(hostname).$(date '+%Y-%m-%d-T%H-%M-%S').cxgb1_01.pcap' 
+  isi_for_array -s 'screen -dm tcpdump -i cxgb1 -C 25 -W 150 -w /ifs/data/Isilon_Support/64428756_monitored_captures/$(hostname).$(date '+%Y-%m-%d-T%H-%M-%S').cxgb1_01.pcap' 
 
 } #end startcap
 
@@ -67,7 +67,7 @@ function monitor(){
 
   #monitoring functions go here
 
-  sleep 60
+  sleep 10 
   echo "Starting Monitor..."
   echo "$(date '+%Y-%m-%d-T%H%M%S') - Starting Monitor" >> capture_log.out 
   while true; do
@@ -75,6 +75,7 @@ function monitor(){
 	  do
 		  let "L++"	
 		  echo "Iteration number $L - processing $q"
+      echo "$(date '+%Y-%m-%d-T%H%M%S') - Iteration number $L" >> capture_log.out
 		  if [[ $(tcpdump -r $q | grep -i "no space") ]]
 	    then
         killcap
@@ -86,6 +87,7 @@ function monitor(){
         isi_for_array -s ps -auwwx >> ./positive_hits/process_log-$L-$(date '+%Y%m%dT%H%M%S').out
         echo "$(date '+%Y-%m-%d-T%H%M%S') - Collecting kern.proc.all_stacks log for iteration $L" >> capture_log.out 
         isi_for_array -s sysctl kern.proc.all_stacks >> ./positive_hits/kern.proc.all_stacks-$L-$(date '+%Y%m%dT%H%M%S').out
+        isi_for_array -s sysctl efs.bam.ec.stats.write_fails_no_space >> ./positive_hits/write_fails_no_space-$L-$(date '+%Y%m%dT%H%M%S').out
         package
         cleanup
         setup
