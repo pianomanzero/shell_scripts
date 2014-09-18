@@ -1,6 +1,5 @@
 #!/bin/bash
 trap ctrl_c INT
-
 function ctrl_c(){
 	echo ""
 	echo "Ending capture..."
