@@ -45,7 +45,7 @@ function startup(){
   echo "Please enter an SR number:"
   read SRNUM
 
-  CAPDIR="/ifs/data/Isilon_Support/$SRNUM_mon_caps-$(date '+%Y-%m-%d-T%H%M%S')"
+  CAPDIR="/ifs/data/Isilon_Support/$SRNUM_pcaps-$(date '+%Y-%m-%d-T%H%M%S')"
   mkdir $CAPDIR
 
   echo "Which interfaces would you like to capture on? (comma-separated list, no spaces)"
@@ -70,8 +70,10 @@ function capture(){
   for i in ${IFACES[@]}
   do
     #put stuff here
+  echo "Capture started on interface $i" >> $CAPDIR/capture_log.out
+
     #start capture
-    isi_for_array -s 'screen -dm tcpdump -i $i -C $MEGABYTES -W $KEEPFILES -w $CAPDIR/$(hostname).$(date '+%Y-%m-%d-T%H-%M-%S').$i_01.pcap' 
+    isi_for_array -s 'screen -dm tcpdump -i $i -C $MEGABYTES -W $KEEPFILES -w $CAPDIR/$(hostname).$(date '+%Y-%m-%d-T%H-%M-%S').$i_01.pcap' &>> capture_log.out
     #indicate capture started in log
 
   done
