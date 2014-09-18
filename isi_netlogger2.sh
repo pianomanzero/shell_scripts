@@ -1,6 +1,20 @@
 #!/bin/bash
 trap ctrl_c INT
 
+function ctrl_c(){
+	echo ""
+	echo "Ending capture..."
+	isi_for_array killall -INT tcpdump
+	echo "Capture ended - $(date)" >> capture_log.out
+	
+  compress
+
+  cleanup
+  
+  echo "Extiting..."
+	exit 0	
+}
+
 function cleanup(){
 
   #cleanup and removal operations go here
@@ -16,19 +30,6 @@ function compress(){
 	echo "Compression complete...."
 } #end compress
 
-function ctrl_c(){
-	echo ""
-	echo "Ending capture..."
-	isi_for_array killall -INT tcpdump
-	echo "Capture ended - $(date)" >> capture_log.out
-	
-  compress
-
-  cleanup
-  
-  echo "Extiting..."
-	exit 0	
-}
 
 function startup(){
   PWD=$(pwd)
