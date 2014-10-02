@@ -30,13 +30,13 @@ function pingit(){
 
   for h in ${hosts[@]}
   do
+    echo ""  >> /ifs/data/Isilon_Support/65910284_100214/pinglog.out
+    echo ""  >> /ifs/data/Isilon_Support/65910284_100214/pinglog.out
+    echo ""  >> /ifs/data/Isilon_Support/65910284_100214/pinglog.out
     echo "$(date '+%Y-%m-%d-T%H-%M-%S') - capture started for $h" >> /ifs/data/Isilon_Support/65910284_100214/pinglog.out
     isi_for_array -s 'screen -dm tcpdump -i lagg0 -C 50 -W 5 -w /ifs/data/Isilon_Support/65910284_100214/$(hostname).$(date '+%Y-%m-%d-T%H-%M-%S').lagg0_01.pcap'
     isi_for_array -s ping -c 5 $h >> /ifs/data/Isilon_Support/65910284_100214/pinglog.out
     echo "$(date '+%Y-%m-%d-T%H-%M-%S') - Ping $h" >> /ifs/data/Isilon_Support/65910284_100214/pinglog.out
-    echo ""  >> /ifs/data/Isilon_Support/65910284_100214/pinglog.out
-    echo ""  >> /ifs/data/Isilon_Support/65910284_100214/pinglog.out
-    echo ""  >> /ifs/data/Isilon_Support/65910284_100214/pinglog.out
     sleep 6
     isi_for_array -s 'killall tcpdump'
   done
