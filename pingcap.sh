@@ -13,7 +13,7 @@ function package(){
 
   tar -czvf /ifs/data/Isilon_Support/65910284_100214.tgz /ifs/data/Isilon_Support/65910284_100214
 
-  #isi_gather_info -f /ifs/data/Isilon_Support/65910284_100214.tgz 
+  isi_gather_info -f /ifs/data/Isilon_Support/65910284_100214.tgz 
 }
 
 
