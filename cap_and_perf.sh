@@ -166,6 +166,36 @@ ARRAY_DELAY=$STATS_DELAY
 ##############################################
 
 
+#############################################
+##
+# Start packet captures
+##
+
+function startcap(){
+  mkdir $LOCATION/packet_captures
+  for d in $(tcpdump -D | egrep -vi "lo|ib" | cut -d "." -f 2)
+  do
+    isi_for_array -s "screen -dm tcpdump -i $(echo $d) -C 125 -W 8 -w $LOCATION/packet_captures/$(hostname).$(date +%Y%m%d).$d.pcap"
+  done
+
+
+}
+
+
+##############################################
+##
+# Kill packet captures
+##
+
+function killcap(){
+
+  isi_for_array -s 'killall -INT tcpdump'
+
+}
+
+
+
+
 ##############################################
 ##
 # Pre-Processing work which can include sysctrls that need to be
@@ -269,6 +299,8 @@ echo ""
 post_processing()
 {
 echo "Beginning Post Processing Work"
+echo "Stopping packet captures"
+killcap
 if [ $CHECK_STATS_GCORE ]; then
 echo ""
 echo "Beginning Post Stat Gcore collection, this could take a few of minutes."
