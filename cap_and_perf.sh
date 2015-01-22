@@ -172,7 +172,7 @@ ARRAY_DELAY=$STATS_DELAY
 ##
 
 function startcap(){
-  mkdir $LOCATION/packet_captures
+mkdir $(echo $LOCATION)/packet_captures
   for d in $(tcpdump -D | egrep -vi "lo|ib" | cut -d "." -f 2)
   do
     isi_for_array -s "screen -dm tcpdump -i $(echo $d) -C 125 -W 8 -w $LOCATION/packet_captures/$(hostname).$(date +%Y%m%d).$d.pcap"
@@ -204,6 +204,8 @@ function killcap(){
 ##
 pre_processing()
 {
+echo "Starting packet captures"
+startcap
 echo "Beginning Pre-Processing Work"
 isi_for_array sysctl isi.stats.client.cifs.max_clients=1024
 isi_for_array sysctl isi.stats.client.smb2.max_clients=1024
