@@ -175,7 +175,7 @@ function startcap(){
 mkdir $(echo $LOCATION)/packet_captures
   for d in $(tcpdump -D | egrep -vi "lo|ib" | cut -d "." -f 2)
   do
-    isi_for_array -s "screen -dm tcpdump -i $(echo $d) -C 125 -W 8 -w $LOCATION/packet_captures/$(hostname).$(date +%Y%m%d).$d.pcap"
+    isi_for_array -s "screen -dm tcpdump -s 0 -i $(echo $d) -C 125 -W 8 -w $LOCATION/packet_captures/$(hostname).$(date +%Y%m%d).$d.pcap"
   done
 
 
