@@ -1,17 +1,4 @@
 #!/bin/bash
-trap ctrl_c INT
-
-function ctrl_c(){
- 
-	isi_for_array -s "killall tcpdump"
-	
-	tar -cvzf $GZIP_NAME $LOCATION/
-	
-	exit 0
-	
- 
- }
-
 
 #######################################################
 ##
