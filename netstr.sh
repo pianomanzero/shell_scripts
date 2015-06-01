@@ -83,7 +83,7 @@ REMOTE_HOST=$1
  ####
  # create individual node hostname dirs
  #######
- isi_for_array -s "mkdir $LOCATION/$(hostname)"
+ mkdir $LOCATION/$(hostname)
  
  
  
@@ -94,7 +94,7 @@ REMOTE_HOST=$1
  
  for i in $(ifconfig | grep flags= | awk -F: '{print $1}' | egrep -v 'lo0|ib0|ib1') 
  do 
-	isi_for_array -s "screen -dm nohup tcpdump -i $i -w $PCAP_LOCATION/$(hostname)_$(date +%Y-%m-%d-T%H%M).$i.pcap"
+	screen -dm nohup tcpdump -i $i -w $PCAP_LOCATION/$(hostname)_$(date +%Y-%m-%d-T%H%M).$i.pcap
 	
  done
  
@@ -119,7 +119,7 @@ do
  # Gather ping stats into separate host files per node
  ##
  
- screen -dm isi_for_array -s "ping -c 10 -D $REMOTE_HOST >> $LOCATION/$(hostname)/$(hostname)_$(date +%Y-%m-%d-T%H%M)_remote_ping_test.txt"
+ screen -dm ping -c 10 -D $REMOTE_HOST >> $LOCATION/$(hostname)/$(hostname)_$(date +%Y-%m-%d-T%H%M)_remote_ping_test.txt
  
  
  
@@ -130,7 +130,7 @@ do
  # Gather traceroute stats into separate host files per node
  ##
  
- screen -dm isi_for_array -s "traceroute $REMOTE_HOST >> $LOCATION/$(hostname)/$(hostname)_$(date +%Y-%m-%d-T%H%M)_remote_traceroute_test.txt"
+ screen -dm traceroute $REMOTE_HOST >> $LOCATION/$(hostname)/$(hostname)_$(date +%Y-%m-%d-T%H%M)_remote_traceroute_test.txt
 
  sleep 5
  
