@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# poke: basic function to test ICMP path to IP host
+# usage: poke <IPaddress>
+
+function poke(){
+
+	# set usage message
+	usage="Usage: poke <IPaddress>"
+
+	# make sure a value was passed
+        if [ $1 = "" ]
+        then
+                echo "ERROR: poke needs a value"
+		echo "$usage"
+                exit 1
+        else
+                REMIP=$1
+        fi
+
+        # initially set to 0, which is 0 pkts recd
+        result="0"
+
+        PING=$(ping $REMIP -c 1 | grep -E -o '[0-9]+ received' | cut -f1 -d' ')
+
+        result=$PING
+
+
+        if [ "$result" != "1" ]
+        then
+                # could not ping address
+                echo "FALSE"
+        
+        else
+                # received result, result should eq 1
+                echo "TRUE"
+        fi
+
+
+
+}
+
+
+# testing... remove before deploying
+echo $(poke $1)

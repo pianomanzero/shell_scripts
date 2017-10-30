@@ -1,0 +1,58 @@
+#!/bin/bash
+if [ $# != 0 ]
+then
+	# dump all passed cli args into an array
+	input=($@)
+
+	# are there -flags?
+	if [ "$(echo $@ | grep -c '-')" == 0 ]
+	then
+		# no dash present, perform normal get
+		# i.e. /usr/local/bin/bugz get <bugnum(s) 
+
+		# comparison stuff	
+		isnum='^[0-9]+$'
+
+		# loop through and check parameters to make sure they're numeric, reject strings, special chars, etc
+		# if parameter is numeric, run a bugz get against each one and send output to less for easier viewing
+		for (( b = 0 ; b < ${#input[@]} ; ++b )) 
+		do
+			if  [[ $(echo ${input[$b]}) =~ $(echo $isnum) ]]
+			then
+				/usr/local/bin/bugz get $(echo ${input[$b]}) | less
+			else
+				pos=$((b+1))
+				echo "ERROR at position $pos: expected an integer, received $(echo ${input[$b]})"
+				exit 1
+			fi
+		done
+
+	else
+	# there are flags, split them up into two arrays
+		
+		declare -a flags
+		declare -a argArray
+		
+		for (( f = 0 ; f < ${#input[@]} ; ++f ))
+		do
+			if [ "$(echo ${input[$f]} | grep -c '-')" == 1 ]
+			then
+				flags+=( ${input[$f]} )
+				flagnum=${#flags[@]}
+			else
+				argArray+=( ${input[$f]} )
+			fi
+		done
+
+		# echo "argArray has ${#argArray[@]} elements: ${argArray[@]}"
+		# echo "flags has ${#flags[@]} elements: ${flags[@]}"
+
+	fi
+
+else
+	# do something else
+	echo && echo
+	echo "No parameters passed. Please include a bug ID number and flags if applicable."
+fi
+exit 0
+
