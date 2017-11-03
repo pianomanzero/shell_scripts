@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # poke: basic function to test ICMP path to IP host
+# intended to be used as part of library in /usr/local/bin
 # usage: poke <IPaddress>
 
 function poke(){
